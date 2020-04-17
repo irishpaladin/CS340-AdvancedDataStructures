@@ -1,25 +1,43 @@
+/*
+	Stephanie Irish Paladin
+	200413341
+
+	**** COMPILE ****
+	>> alias newg++ g++ -std=c++11
+	>> newg++ -c assign3srp796.cpp
+	>> newg++ assign3srp796.o -o main
+
+	**** EXCECUTE ****
+	>> main 10 4			(where 10 is the N and 4 is the K)
+
+	***** OR *****
+	>> main  10 4 d			(add d to display the unsorted and sorted elements)
+
+
+	**** READ ME ****
+	(c) All the sorting algorithms are taken from website geeksforgeeks.org
+	> This programs assumes that you are giving it a right data type value
+		when you have correct number of arguments
+	> ** This program works correctly only if you compile and run it in cli **
+	> ** Use the above two commands to run the program **
+*/
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <sys/time.h> 
+#include <bits/stdc++.h> 
+#include <chrono> 
 
 using namespace std;
 
-struct timeval* tp;
-struct timezone* tzp;
-
+// Global varibles
 const int MAX_LENGTH = 10000;
-int arr[MAX_LENGTH];
-int arr_orig[MAX_LENGTH];
-
-double  mytime2()
-{
-	gettimeofday(tp, tzp);
-	return ((double)tp->tv_sec) * 1000000000.0 +
-		((double)tp->tv_usec);
-}
+int arr[MAX_LENGTH];		// array that will be sorted
+int arr_orig[MAX_LENGTH];	// contains the original array
 
 
+// Insertion Sort Algorithm
+// n - number of elements to be sorted
 void insertionSort(int n)
 {
 	int i, key, j;
@@ -41,6 +59,10 @@ void insertionSort(int n)
 }
 
 
+// Merge Sort Algorithm
+// l - left index
+// r - right index of the
+// m - middle index
 void merge(int l, int m, int r)
 {
 	int i, j, k;
@@ -93,8 +115,6 @@ void merge(int l, int m, int r)
 		k++;
 	}
 }
-/* l is for left index and r is right index of the
-   sub-array of arr to be sorted */
 void mergeSort(int l, int r)
 {
 	if (l < r)
@@ -111,13 +131,14 @@ void mergeSort(int l, int r)
 	}
 }
 
+
+// Quick Sort Algorithm
 void swap(int* a, int* b)
 {
 	int t = *a;
 	*a = *b;
 	*b = t;
 }
-
 /* This function takes last element as pivot, places
 the pivot element at its correct position in sorted
 array, and places all smaller (smaller than pivot)
@@ -140,7 +161,6 @@ int partition(int low, int high)
 	swap(&arr[i + 1], &arr[high]);
 	return (i + 1);
 }
-
 /* The main function that implements QuickSort
 arr[] --> Array to be sorted,
 low --> Starting index,
@@ -160,6 +180,8 @@ void quickSort(int low, int high)
 	}
 }
 
+
+// Quick Insertion Sort ALgorithm
 void quickInsertion(int low, int high, int k)
 {
 	if ((high - low + 1) < k) {
@@ -175,6 +197,8 @@ void quickInsertion(int low, int high, int k)
 	}
 }
 
+
+// Function that copies the arr_orig to arr array
 void copyArray(int n) {
 	for (int i = 0; i < n; i++) {
 		arr[i] = arr_orig[i];
@@ -182,60 +206,138 @@ void copyArray(int n) {
 }
 
 
+// Function that prints the arr array
+void printArr(int n) {
+	for (int i = 0; i < n; i++) {
+		cout << arr[i] << "  ";
+	}
+	cout << endl;
+}
+
+
 int main(int argc, char** argv) {
 
-	double mytime2(), starttime = 0, endtime = 0;
-	tp = (struct timeval*) calloc(1, sizeof(struct timeval));
+	double time_taken;	// variable to store the runtimes
+	srand(time(NULL)); // initialize seed to produce random numbers
+	bool display = false;
 
-	srand(time(NULL));
-
-	if (argc != 3) {
-		cout << endl << "    Invalid command. Please try again with this format: srp796 <N> <K>" << endl << endl;
+	// Commands validation
+	// Check if elements are needed to be display
+	if (argc == 4) {
+		if (argv[3][0] == 'd') {
+			display = true;
+		}
+		else {
+			cout << endl << "    Invalid command. Please try again with either of this format: " << endl;
+			cout << "     srp796 <N> <K>       ->   displays just the running time" << endl;
+			cout << "     srp796 <N> <K> d     ->   displays just running time and the elements" << endl << endl;
+			exit(0);
+		}
+	}
+	// Check is command has right number of argument
+	if (argc != 3 && argc != 4) {
+		cout << endl << "    Invalid command. Please try again with either of this format: " << endl;
+		cout << "     srp796 <N> <K>       ->   displays just the running time" << endl;
+		cout << "     srp796 <N> <K> d     ->   displays just running time and the elements" << endl << endl;
 		exit(0);
 	}
+
+	// Take the N and K in the cmd argument
 	int n = std::atoi(argv[1]);
 	int k = std::atoi(argv[2]);
 
-	//int n, k;
-	//cout << "Enter the number of integer elements: ";
-	//cin >> n;
-	//cout << "Enter the number k: ";
-	//cin >> k;
-
-	// Generating random values
+	// Generate random n values
 	for (int i = 0; i < n; i++)
 	{
 		arr[i] = rand() % 1000;
 		arr_orig[i] = arr[i];
+
+	}
+	cout << endl;
+	if (display) {
+		cout << "Unsorted elements: " << endl;
+		printArr(n);
 	}
 
 
-	cout << "Insertion sort : ";
-	starttime = mytime2();
+	// Insertion Sort
+	auto start = chrono::high_resolution_clock::now();
+	// unsync the I/O of C and C++. 
+	ios_base::sync_with_stdio(false);
 	insertionSort(n);
-	endtime = mytime2();
-	cout << endtime - starttime << " micro seconds" << endl;
+	auto end = chrono::high_resolution_clock::now();
+	if (display) {
+		cout << "\nAfter Insertion sort: " << endl;
+		printArr(n);
+	}
+	// Calculating total time taken by the program. 
+	time_taken = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+	time_taken *= 1e-9;
+	cout << "Insertion sort : ";
+	cout << fixed << time_taken << setprecision(9);
+	cout << " sec" << endl;
+
 	copyArray(n);
 
-	cout << "Merge sort     : ";
-	starttime = mytime2();
+	// Merge Sort
+	start = chrono::high_resolution_clock::now();
+	// unsync the I/O of C and C++. 
+	ios_base::sync_with_stdio(false);
 	mergeSort(0, n - 1);
-	endtime = mytime2();
-	cout << endtime - starttime << " micro seconds" << endl;
+	end = chrono::high_resolution_clock::now();
+	if (display) {
+		cout << "\nAfter Merge sort: " << endl;
+		printArr(n);
+	}
+	// Calculating total time taken by the program. 
+	time_taken = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+	time_taken *= 1e-9;
+	cout << "Merge sort     : ";
+	cout << fixed << time_taken << setprecision(9);
+	cout << " sec" << endl;
+
+
 	copyArray(n);
 
-	cout << "Quick Sort     : ";
-	starttime = mytime2();
+
+	// Quick Sort
+	start = chrono::high_resolution_clock::now();
+	// unsync the I/O of C and C++. 
+	ios_base::sync_with_stdio(false);
 	quickSort(0, n - 1);
-	endtime = mytime2();
-	cout << endtime - starttime << " micro seconds" << endl;
+	end = chrono::high_resolution_clock::now();
+	if (display) {
+		cout << "\nAfter Quick sort: " << endl;
+		printArr(n);
+	}
+	// Calculating total time taken by the program. 
+	time_taken = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+	time_taken *= 1e-9;
+	cout << "Quick Sort     : ";
+	cout << fixed << time_taken << setprecision(9);
+	cout << " sec" << endl;
+
+
 	copyArray(n);
 
-	cout << "Quick Insertion: ";
-	starttime = mytime2();
-	quickInsertion(0, n - 1, k);
-	endtime = mytime2();
-	cout << endtime - starttime << " micro seconds" << endl;
 
+	// Quick Insertion Sort
+	start = chrono::high_resolution_clock::now();
+	// unsync the I/O of C and C++. 
+	ios_base::sync_with_stdio(false);
+	quickInsertion(0, n - 1, k);
+	end = chrono::high_resolution_clock::now();
+	if (display) {
+		cout << "\nAfter Quick-Insertion sort: " << endl;
+		printArr(n);
+	}
+	// Calculating total time taken by the program. 
+	time_taken = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+	time_taken *= 1e-9;
+	cout << "Quick Insertion: ";
+	cout << fixed << time_taken << setprecision(9);
+	cout << " sec" << endl;
+
+	cout << endl;
 	return 0;
 }
